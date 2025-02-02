@@ -1,0 +1,384 @@
+{% assign arrow_default = "url('data:image/svg+xml;utf8,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 height%3D%2224px%22 viewBox%3D%220 -960 960 960%22 width%3D%2224px%22 fill%3D%22%23000%22%3E%3Cpath d%3D%22M286.15-293.85 100-479.62l185.77-185.76 42.15 41.76-113 113.62h530.16l-113-113.62 42.15-41.76L860-479.62 674.23-293.85l-42.54-41.77 113.39-114H214.54l113.38 114-41.77 41.77Z%22/%3E%3C/svg%3E')" %}
+
+<style>
+    #beforeAfterContainer {
+      position: relative;
+      display: flex;
+      aspect-ratio: 3 / 2;
+      width: {{ block.settings.containerWidth }};
+      min-height:20vh;
+      max-height: {{block.settings.maxContainerHeight}};
+      height: 100%;
+      margin:{{ block.settings.containerPadding }};
+    }
+
+    .img-wrapper {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: {{block.settings.containerBorderRadius}}px;
+    }
+
+    .img-wrapper:nth-child(2) {
+      clip-path: inset(0px 0px 0px 50%);
+    }
+
+    .img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #line {
+      position: absolute;
+      left: 50%;
+      display:block;
+      transform: translateX(-50%);
+      width:  {{ block.settings.seperator_width}}rem;
+      height: 100%;
+      background-color: {{block.settings.seperator_color}};
+    }
+
+    input {
+      /* reset */
+      appearance: none;
+      -webkit-appearance: none;
+      background-color: transparent;
+      /* custom */
+      position: absolute;
+      width: calc(100% + 2.25rem);
+      height: 100%;
+      left: -1.125rem;
+    }
+
+    input::-webkit-slider-thumb {
+      /* reset */
+      -webkit-appearance: none;
+      appearance: none;
+      /* custom */
+      height: {{block.settings.handle_height}}rem;
+      width:{{block.settings.handle_width}}rem;
+      border-radius: 50%;
+      box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.1);
+      {% comment %} background-color: #fff; {% endcomment %}
+      background-image: {% if block.settings.arrow != blank %} url({{ block.settings.arrow | img_url: 'small' }}) {% else %} {{ arrow_default }} {% endif %};
+      background-size: cover;
+      cursor: {{ block.settings.cursor_style }};
+
+    }
+
+    input::-moz-range-thumb {
+      height: {{block.settings.handle_height}}rem;
+      width:{{block.settings.handle_width}}rem;
+      border-radius: 50%;
+      box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      background-image: {% if block.settings.arrow != blank %} url({{ block.settings.arrow | img_url: 'small' }}) {% else %} {{ arrow_default }} {% endif %};
+      background-size: cover;
+      cursor: {{ block.settings.cursor_style }};
+    }
+
+    input:active::-webkit-slider-thumb {
+      cursor: {{ block.settings.cursor_style }};
+    }
+
+    input:active::-moz-slider-thumb {
+      cursor: {{ block.settings.cursor_style }};
+    }
+
+    .before-after-text {
+      border-radius: {{ block.settings.before_after_border_radius }}px;
+      position: absolute;
+      top: {{block.settings.horizontal_text_position}}%;
+      transform: translateY(-50%);
+      background: {{ block.settings.before_after_background_color }};
+      padding: {{ block.settings.before_after_padding }};
+      line-height: {{ block.settings.before_after_line_height }};
+      font-size: {{ block.settings.before_after_font_size }};
+    }
+
+    .before-after-text.before {
+      left: {{ block.settings.vertical_text_position }}%;
+    }
+
+    .before-after-text.after {
+      right: {{ block.settings.vertical_text_position }}%;
+    }
+
+    @media only screen and (max-width:768px){
+      #beforeAfterContainer {
+      width: {{ block.settings.containerWidth }};
+      max-height: {{block.settings.maxMobContainerHeight}};
+      margin:{{ block.settings.mobileContainerPadding }};
+    }
+      .before-after-text {
+      top: {{block.settings.mobile_horizontal_text_position}}%;
+    }
+
+    .before-after-text.before {
+      left: {{ block.settings.mobile_vertical_text_position }}%;
+    }
+
+    .before-after-text.after {
+      right: {{ block.settings.mobile_vertical_text_position }}%;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const imgAfter = document.querySelector('.img-wrapper:nth-of-type(2)');
+    const line = document.getElementById('line');
+    const slider = document.querySelector('#slider');
+
+    if (imgAfter && line && slider) {
+      slider.addEventListener('input', () => {
+        const value = slider.value;
+        line.style.left = `${value}%`;
+        imgAfter.style.clipPath = `inset(0px 0px 0px ${value}%)`;
+      });
+
+      slider.addEventListener('dblclick', () => {
+        slider.value = 50;
+        line.style.left = '50%';
+        imgAfter.style.clipPath = 'inset(0px 0px 0px 50%)';
+      });
+    }
+  });
+</script>
+
+<div id="beforeAfterContainer" aria-label="Before and after image slider">
+  <div class="img-wrapper">
+    {% if block.settings.image1 != blank %}
+      {{ block.settings.image1 | image_url: width: 1080 | image_tag: class: 'card-img-top', loading: 'lazy' }}
+    {% endif %}
+    <p class="before-after-text before">Before</p>
+  </div>
+  <div class="img-wrapper">
+    {% if block.settings.image2 != blank %}
+      {{ block.settings.image2 | image_url: width: 1080 | image_tag: class: 'card-img-top', loading: 'lazy' }}
+    {% endif %}
+    <p class="before-after-text after">After</p>
+  </div>
+  <div id="line"></div>
+  <input id="slider" type="range" min="0" max="100" value="50">
+</div>
+
+{% schema %}
+{
+  "name": "Before After",
+  "target": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Container Settings"
+    },
+    {
+      "type": "text",
+      "id": "containerWidth",
+      "label": "Width",
+      "default": "100%"
+    },
+    {
+      "type": "text",
+      "id": "maxContainerHeight",
+      "label": "Desktop Height",
+      "default": "80vh"
+    },
+    {
+      "type": "text",
+      "id": "maxMobContainerHeight",
+      "label": "Mobile Height",
+      "default": "80vh"
+    },
+    {
+      "type": "text",
+      "id": "containerPadding",
+      "label": "Desktop Margin",
+      "default": "40px 0px 40px 0px"
+    },
+    {
+      "type": "text",
+      "id": "mobileContainerPadding",
+      "label": "Mobile Margin",
+      "default": "20px 0px 20px 0px"
+    },
+    {
+      "type": "range",
+      "id": "containerBorderRadius",
+      "label": "Border Radius",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "Image Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "image1",
+      "label": "Before Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image2",
+      "label": "After Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "arrow",
+      "label": "Arrow"
+    },
+
+    {
+      "type": "header",
+      "content": "Separator Settings"
+    },
+    {
+      "type": "range",
+      "id": "seperator_width",
+      "label": "Separator Width",
+      "min": 0,
+      "max": 10,
+      "step": 0.1,
+      "unit": "rem",
+      "default": 0.2
+    },
+    {
+      "type": "color",
+      "id": "seperator_color",
+      "label": "Separator Color",
+      "default": "#fff"
+    },
+
+    {
+      "type": "header",
+      "content": "Handle Settings"
+    },
+    {
+      "type": "range",
+      "id": "handle_width",
+      "label": "Handle Width",
+      "min": 0,
+      "max": 10,
+      "step": 0.1,
+      "unit": "rem",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "handle_height",
+      "label": "Handle Height",
+      "min": 0,
+      "max": 10,
+      "step": 0.1,
+      "unit": "rem",
+      "default": 3
+    },
+
+    {
+      "type": "header",
+      "content": "Cursor Settings"
+    },
+    {
+      "type": "select",
+      "id": "cursor_style",
+      "label": "Cursor Style",
+      "options": [
+        { "value": "default", "label": "Default" },
+        { "value": "pointer", "label": "Pointer" },
+        { "value": "grab", "label": "Grab" },
+        { "value": "grabbing", "label": "Grabbing" },
+        { "value": "crosshair", "label": "Crosshair" },
+        { "value": "col-resize", "label": "Col Resize" },
+        { "value": "row-resize", "label": "Row Resize" }
+      ],
+      "default": "col-resize"
+    },
+
+    {
+      "type": "header",
+      "content": "Text Box Settings"
+    },
+    {
+      "type": "range",
+      "id": "before_after_border_radius",
+      "label": "Border Radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "before_after_background_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "before_after_padding",
+      "label": "Padding",
+      "default": "5px 15px"
+    },
+    {
+      "type": "text",
+      "id": "before_after_line_height",
+      "label": "Line Height",
+      "default": "24px"
+    },
+    {
+      "type": "text",
+      "id": "before_after_font_size",
+      "label": "Font Size",
+      "default": "16px"
+    },
+    {
+      "type": "range",
+      "id": "horizontal_text_position",
+      "label": "Desktop Horizontal Position",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "mobile_horizontal_text_position",
+      "label": "Mobile Horizontal Position",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 76
+    },
+    {
+      "type": "range",
+      "id": "vertical_text_position",
+      "label": "Desktop Vertical Position",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "mobile_vertical_text_position",
+      "label": "Mobile Vertical Position",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 2
+    }
+  ]
+}
+{% endschema %}
