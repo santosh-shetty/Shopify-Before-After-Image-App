@@ -1,7 +1,9 @@
 {% assign arrow_default = "url('data:image/svg+xml;utf8,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 height%3D%2224px%22 viewBox%3D%220 -960 960 960%22 width%3D%2224px%22 fill%3D%22%23000%22%3E%3Cpath d%3D%22M286.15-293.85 100-479.62l185.77-185.76 42.15 41.76-113 113.62h530.16l-113-113.62 42.15-41.76L860-479.62 674.23-293.85l-42.54-41.77 113.39-114H214.54l113.38 114-41.77 41.77Z%22/%3E%3C/svg%3E')" %}
+{% assign before_image = 'before.jpg' %}
+{% assign after_image = 'after.jpg' %}
 
 <style>
-    #beforeAfterContainer {
+    .beforeAfterContainer {
       position: relative;
       display: flex;
       aspect-ratio: 3 / 2;
@@ -107,7 +109,7 @@
     }
 
     @media only screen and (max-width:768px){
-      #beforeAfterContainer {
+      .beforeAfterContainer {
       width: {{ block.settings.containerWidth }};
       max-height: {{block.settings.maxMobContainerHeight}};
       margin:{{ block.settings.mobileContainerPadding }};
@@ -148,16 +150,20 @@
   });
 </script>
 
-<div id="beforeAfterContainer" aria-label="Before and after image slider">
+<div class="beforeAfterContainer" aria-label="Before and after image slider">
   <div class="img-wrapper">
     {% if block.settings.image1 != blank %}
       {{ block.settings.image1 | image_url: width: 1080 | image_tag: class: 'card-img-top', loading: 'lazy' }}
+    {% else %}
+       <img src="{{before_image | asset_img_url }}" height="100%" width="100%" loading="lazy">
     {% endif %}
     <p class="before-after-text before">Before</p>
   </div>
   <div class="img-wrapper">
     {% if block.settings.image2 != blank %}
       {{ block.settings.image2 | image_url: width: 1080 | image_tag: class: 'card-img-top', loading: 'lazy' }}
+    {% else %}
+      <img src="{{after_image | asset_img_url }}" height="100%" width="100%" loading="lazy">
     {% endif %}
     <p class="before-after-text after">After</p>
   </div>
