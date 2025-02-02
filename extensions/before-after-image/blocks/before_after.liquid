@@ -14,7 +14,7 @@
       margin:{{ block.settings.containerPadding }};
     }
 
-    .img-wrapper {
+   .beforeAfterContainer .ba_img-wrapper {
       position: absolute;
       width: 100%;
       height: 100%;
@@ -22,55 +22,50 @@
       border-radius: {{block.settings.containerBorderRadius}}px;
     }
 
-    .img-wrapper:nth-child(2) {
+   .beforeAfterContainer  .ba_img-wrapper:nth-child(2) {
       clip-path: inset(0px 0px 0px 50%);
     }
 
-    .img-wrapper img {
+   .beforeAfterContainer  .ba_img-wrapper img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    #line {
+   .beforeAfterContainer  .ba_line {
       position: absolute;
       left: 50%;
-      display:block;
+      display:block !important;
       transform: translateX(-50%);
       width:  {{ block.settings.seperator_width}}rem;
       height: 100%;
       background-color: {{block.settings.seperator_color}};
     }
 
-    input {
-      /* reset */
+   .beforeAfterContainer  input {
       appearance: none;
       -webkit-appearance: none;
       background-color: transparent;
-      /* custom */
       position: absolute;
       width: calc(100% + 2.25rem);
       height: 100%;
       left: -1.125rem;
     }
 
-    input::-webkit-slider-thumb {
-      /* reset */
+   .beforeAfterContainer  input::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      /* custom */
       height: {{block.settings.handle_height}}rem;
       width:{{block.settings.handle_width}}rem;
       border-radius: 50%;
       box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.1);
-      {% comment %} background-color: #fff; {% endcomment %}
       background-image: {% if block.settings.arrow != blank %} url({{ block.settings.arrow | img_url: 'small' }}) {% else %} {{ arrow_default }} {% endif %};
       background-size: cover;
       cursor: {{ block.settings.cursor_style }};
 
     }
 
-    input::-moz-range-thumb {
+   .beforeAfterContainer  input::-moz-range-thumb {
       height: {{block.settings.handle_height}}rem;
       width:{{block.settings.handle_width}}rem;
       border-radius: 50%;
@@ -81,15 +76,15 @@
       cursor: {{ block.settings.cursor_style }};
     }
 
-    input:active::-webkit-slider-thumb {
+    .beforeAfterContainer  input:active::-webkit-slider-thumb {
       cursor: {{ block.settings.cursor_style }};
     }
 
-    input:active::-moz-slider-thumb {
+   .beforeAfterContainer  input:active::-moz-slider-thumb {
       cursor: {{ block.settings.cursor_style }};
     }
 
-    .before-after-text {
+   .beforeAfterContainer  .before-after-text {
       border-radius: {{ block.settings.before_after_border_radius }}px;
       position: absolute;
       top: {{block.settings.horizontal_text_position}}%;
@@ -100,29 +95,29 @@
       font-size: {{ block.settings.before_after_font_size }};
     }
 
-    .before-after-text.before {
+    .beforeAfterContainer .before-after-text.before {
       left: {{ block.settings.vertical_text_position }}%;
     }
 
-    .before-after-text.after {
+   .beforeAfterContainer  .before-after-text.after {
       right: {{ block.settings.vertical_text_position }}%;
     }
 
     @media only screen and (max-width:768px){
-      .beforeAfterContainer {
+   .beforeAfterContainer    .beforeAfterContainer {
       width: {{ block.settings.containerWidth }};
       max-height: {{block.settings.maxMobContainerHeight}};
       margin:{{ block.settings.mobileContainerPadding }};
     }
-      .before-after-text {
+   .beforeAfterContainer    .before-after-text {
       top: {{block.settings.mobile_horizontal_text_position}}%;
     }
 
-    .before-after-text.before {
+   .beforeAfterContainer  .before-after-text.before {
       left: {{ block.settings.mobile_vertical_text_position }}%;
     }
 
-    .before-after-text.after {
+   .beforeAfterContainer  .before-after-text.after {
       right: {{ block.settings.mobile_vertical_text_position }}%;
     }
   }
@@ -130,36 +125,45 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const imgAfter = document.querySelector('.img-wrapper:nth-of-type(2)');
-    const line = document.getElementById('line');
-    const slider = document.querySelector('#slider');
+    // Select all before and after containers
+    const containers = document.querySelectorAll('.beforeAfterContainer');
 
-    if (imgAfter && line && slider) {
-      slider.addEventListener('input', () => {
-        const value = slider.value;
-        line.style.left = `${value}%`;
-        imgAfter.style.clipPath = `inset(0px 0px 0px ${value}%)`;
-      });
+    containers.forEach((container) => {
+      const imgBefore = container.querySelector('.ba_img-wrapper:nth-of-type(1)');
+      const imgAfter = container.querySelector('.ba_img-wrapper:nth-of-type(2)');
+      const line = container.querySelector('.ba_line');
+      const slider = container.querySelector('.ba_slider');
 
-      slider.addEventListener('dblclick', () => {
-        slider.value = 50;
-        line.style.left = '50%';
-        imgAfter.style.clipPath = 'inset(0px 0px 0px 50%)';
-      });
-    }
+      if (imgAfter && line && slider) {
+        // Handle slider input
+        slider.addEventListener('input', () => {
+          const value = slider.value;
+          line.style.left = `${value}%`;
+          imgAfter.style.clipPath = `inset(0px 0px 0px ${value}%)`;
+        });
+
+        // Reset slider on double-click
+        slider.addEventListener('dblclick', () => {
+          slider.value = 50;
+          line.style.left = '50%';
+          imgAfter.style.clipPath = 'inset(0px 0px 0px 50%)';
+        });
+      }
+    });
   });
 </script>
 
-<div class="beforeAfterContainer" aria-label="Before and after image slider">
-  <div class="img-wrapper">
+test {{ block.settings.arrow }}
+<div class="beforeAfterContainer">
+  <div class="ba_img-wrapper">
     {% if block.settings.image1 != blank %}
       {{ block.settings.image1 | image_url: width: 1080 | image_tag: class: 'card-img-top', loading: 'lazy' }}
     {% else %}
-       <img src="{{before_image | asset_img_url }}" height="100%" width="100%" loading="lazy">
+      <img src="{{before_image | asset_img_url }}" height="100%" width="100%" loading="lazy">
     {% endif %}
     <p class="before-after-text before">Before</p>
   </div>
-  <div class="img-wrapper">
+  <div class="ba_img-wrapper">
     {% if block.settings.image2 != blank %}
       {{ block.settings.image2 | image_url: width: 1080 | image_tag: class: 'card-img-top', loading: 'lazy' }}
     {% else %}
@@ -167,8 +171,8 @@
     {% endif %}
     <p class="before-after-text after">After</p>
   </div>
-  <div id="line"></div>
-  <input id="slider" type="range" min="0" max="100" value="50">
+  <div class="ba_line"></div>
+  <input class="ba_slider" type="range" min="0" max="100" value="50">
 </div>
 
 {% schema %}
@@ -235,11 +239,6 @@
       "id": "image2",
       "label": "After Image"
     },
-    {
-      "type": "image_picker",
-      "id": "arrow",
-      "label": "Arrow"
-    },
 
     {
       "type": "header",
@@ -265,6 +264,11 @@
     {
       "type": "header",
       "content": "Handle Settings"
+    },
+       {
+      "type": "image_picker",
+      "id": "arrow",
+      "label": "Arrow"
     },
     {
       "type": "range",
